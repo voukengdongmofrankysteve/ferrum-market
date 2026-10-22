@@ -1,0 +1,6 @@
+# The app lives next to its public folder. Only public/ may be served; everything else (vendor, storage,
+# deploy.env, database) answers 403 when someone reaches it through the main domain.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(?!public/) - [F,L]
+</IfModule>
