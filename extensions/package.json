@@ -1,0 +1,9 @@
+{
+  "name": "ferrum-official-extensions",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test/tools.test.mjs test/grammars.test.mjs"
+  }
+}

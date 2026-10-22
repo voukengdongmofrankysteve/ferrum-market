@@ -4,9 +4,12 @@ namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use App\Support\Official;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Throwable;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->createDatabaseOnFirstRun();
+        $this->publishOfficialExtensions();
 
         // Sign-in, sign-up: slow down guessing from one address.
         RateLimiter::for('auth', fn (Request $r) => Limit::perMinute(10)->by($r->ip()));
@@ -40,5 +44,20 @@ class AppServiceProvider extends ServiceProvider
         @mkdir(dirname($file), 0775, true);
         @touch($file);
         Artisan::call('migrate', ['--force' => true]);
+    }
+
+    /** The first web request after a deploy publishes the extensions in resources/official (see App\Support\Official). */
+    private function publishOfficialExtensions(): void
+    {
+        if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true) || ! config('market.seed_official', true)) {
+            return;
+        }
+        try {
+            if (Schema::hasTable('extensions')) {
+                Official::sync();
+            }
+        } catch (Throwable $e) {
+            report($e);
+        }
     }
 }

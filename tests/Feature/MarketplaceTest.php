@@ -16,6 +16,13 @@ class MarketplaceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Bundles and icons are stored by database id: never write them into the real storage folder.
+        Storage::fake('local');
+    }
+
     private function bundle(array $manifest = [], array $files = []): array
     {
         $m = array_merge([
