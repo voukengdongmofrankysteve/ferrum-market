@@ -41,6 +41,8 @@ Everything that registers something (`commands.register`, `events.on`, `window.s
 | `setStatusBar(id, { text, tooltip?, command? })` | Puts text in the status bar. When the person clicks it, `command` runs. Call again with the same `id` to update. Returns a disposable that removes it. |
 | `showPanel({ title, html })` | Opens a tab with your HTML. Returns a panel. See [Panels with HTML](/docs/webviews). |
 | `withProgress(title, fn)` | Shows `title` in the status bar while the async function `fn` runs. |
+| `registerTreeView(viewId, provider)` | Fills a sidebar view declared in `contributes.views` with a tree. Returns `{ refresh(), setBadge(n), setTitle(t), dispose() }`. See [Sidebar views](/docs/views). |
+| `registerHtmlView(viewId, { html })` | Fills a sidebar view with a page of HTML. Returns `{ setHtml, postMessage, onMessage, setBadge, setTitle, dispose }`. See [Sidebar views](/docs/views). |
 
 ## ferrum.editor
 
@@ -56,6 +58,8 @@ Works on the file the person is editing. Positions are `{ line, col }`, both sta
 | `edit(edits)` | Applies several `{ range, text }` edits as **one** undoable change. Ranges refer to the text before any edit. |
 | `setSelection(start, end?)` | Moves the cursor or selects a range, and scrolls it into view. |
 | `openFile(path, position?)` | Opens a file (needs `workspace.read`). |
+| `createDecorationType(options)` | Makes a look (a background, an underline, a gutter mark, a note after the line). Returns `{ id, dispose() }`. See [Decorations](/docs/decorations). |
+| `setDecorations(type, ranges, path?)` | Paints `type` on the given ranges of the open file, replacing what it marked before. An empty list clears it. No permission needed. See [Decorations](/docs/decorations). |
 
 Editing a file that is read-only rejects with an error.
 
@@ -108,6 +112,7 @@ Private storage that stays between sessions, for this extension only. Values mus
 | --- | --- |
 | `open` | `{ path, name, language }`, when a file is opened. |
 | `save` | `{ path, name, language }`, after a file is saved. |
+| `change` | `{ path, name, language }`, when the text of the open file changed. Sent about 150 ms after the last change. Use it to repaint [decorations](/docs/decorations). |
 | `activeChanged` | `{ path, name, language }` or `undefined`, when the person switches file. |
 | `selectionChanged` | `{ selection }`, when the cursor or selection moves (at most 10 times a second). |
 | `settingsChanged` | `{ key, value }`, for this extension's settings. |

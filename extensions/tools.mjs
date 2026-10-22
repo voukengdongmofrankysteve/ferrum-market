@@ -153,7 +153,7 @@ No permissions needed.
 `,
   },
   {
-    id: 'bookmarks', name: 'Bookmarks', icon: 'BK', category: 'Productivity', perms: ['workspace.read'], startup: true,
+    id: 'bookmarks', api: '^0.1.1', version: '1.1.0', views: { boxes: [{ id: 'bookmarks', title: 'Bookmarks', icon: 'bookmark' }], list: [{ id: 'bookmarks.list', name: 'Bookmarks', container: 'bookmarks', type: 'tree' }] }, hidden: ['bookmarks.goto'], name: 'Bookmarks', icon: 'BK', category: 'Productivity', perms: ['workspace.read'], startup: true,
     desc: 'Mark lines, jump to the next or previous bookmark, and list bookmarks across files. They are remembered.',
     commands: [C('bookmarks.toggle', 'Toggle Bookmark'), C('bookmarks.next', 'Go to Next Bookmark'), C('bookmarks.previous', 'Go to Previous Bookmark'), C('bookmarks.list', 'List All Bookmarks'), C('bookmarks.clearFile', 'Clear Bookmarks in This File'), C('bookmarks.clearAll', 'Clear All Bookmarks')],
     keys: [['bookmarks.toggle', 'Shift+Alt+B'], ['bookmarks.next', 'Shift+Alt+N'], ['bookmarks.previous', 'Shift+Alt+P']],
@@ -165,10 +165,14 @@ Mark a line (Shift+Alt+B), jump to the next (Shift+Alt+N) or previous (Shift+Alt
 Bookmarks are tied to line numbers, so after big edits above a bookmark it may point a few lines off.
 
 Permissions: workspace.read (to open the file when you pick a bookmark from another file).
+
+## Sidebar
+
+Since 1.1.0 an icon in the activity bar lists every bookmark, grouped by file. Bookmarked lines show a star in the gutter and a soft highlight.
 `,
   },
   {
-    id: 'quick-notes', name: 'Quick Notes', icon: 'QN', category: 'Productivity', perms: [],
+    id: 'quick-notes', api: '^0.1.1', version: '1.1.0', views: { boxes: [{ id: 'notes', title: 'Quick Notes', icon: 'note' }], list: [{ id: 'quickNotes.page', name: 'Notes', container: 'notes', type: 'html' }] }, name: 'Quick Notes', icon: 'QN', category: 'Productivity', perms: [],
     desc: 'A notepad panel for each project. Notes are saved and come back when you reopen the project.',
     commands: [C('quickNotes.open', 'Open Quick Notes'), C('quickNotes.addSelection', 'Add Selection to Quick Notes')],
     keys: [],
@@ -180,10 +184,14 @@ A notepad for each project, always one command away. It saves as you type, remem
 **Add Selection to Quick Notes** appends the selected code with its file name and line number, so you can come back to it later.
 
 No permissions needed. Notes stay on your computer.
+
+## Sidebar
+
+Since 1.1.0 the notepad is also a page in the activity bar, next to your files, and shows the same notes.
 `,
   },
   {
-    id: 'npm-scripts', name: 'NPM Scripts', icon: 'NPM', category: 'Tools', perms: ['workspace.read', 'terminal'],
+    id: 'npm-scripts', api: '^0.1.1', version: '1.1.0', views: { boxes: [{ id: 'npm', title: 'NPM Scripts', icon: 'package' }], list: [{ id: 'npmScripts.list', name: 'Scripts', container: 'npm', type: 'tree' }] }, hidden: ['npmScripts.runScript'], name: 'NPM Scripts', icon: 'NPM', category: 'Tools', perms: ['workspace.read', 'terminal'],
     desc: 'List and run package.json scripts in the terminal, with npm, pnpm, yarn or bun picked from your lock file.',
     commands: [C('npmScripts.show', 'Show Scripts Panel'), C('npmScripts.run', 'Run Script...'), C('npmScripts.runWithArgs', 'Run Script with Arguments...'), C('npmScripts.install', 'Install Dependencies')],
     keys: [],
@@ -197,10 +205,14 @@ The package manager is chosen from the lock file (\`pnpm-lock.yaml\`, \`yarn.loc
 ## Permissions
 - **workspace.read** to read package.json and the lock files.
 - **terminal** to run the command in the terminal.
+
+## Sidebar
+
+Since 1.1.0 an NPM Scripts icon in the activity bar lists every script. Click one to run it in the terminal.
 `,
   },
   {
-    id: 'git-quick', name: 'Git Quick Actions', icon: 'GQ', category: 'Git', perms: ['terminal'],
+    id: 'git-quick', api: '^0.1.1', version: '1.1.0', views: { boxes: [{ id: 'git', title: 'Git Quick', icon: 'source-control' }], list: [{ id: 'gitQuick.actions', name: 'Actions', container: 'git', type: 'html' }] }, name: 'Git Quick Actions', icon: 'GQ', category: 'Git', perms: ['terminal'],
     desc: 'Status, pull, push, commit, branch, stash, log and blame as commands. Everything runs visibly in the terminal.',
     commands: [C('gitQuick.status', 'Status'), C('gitQuick.pull', 'Pull'), C('gitQuick.push', 'Push'), C('gitQuick.fetch', 'Fetch All'), C('gitQuick.commit', 'Commit Staged...'), C('gitQuick.commitAll', 'Stage All and Commit...'), C('gitQuick.amend', 'Amend Last Commit'), C('gitQuick.undoCommit', 'Undo Last Commit (Keep Changes)'),
       C('gitQuick.newBranch', 'New Branch...'), C('gitQuick.switchBranch', 'Switch Branch...'), C('gitQuick.branches', 'List Branches'), C('gitQuick.stash', 'Stash Changes'), C('gitQuick.stashPop', 'Pop Stash'), C('gitQuick.log', 'Show Log Graph'), C('gitQuick.diff', 'Show Diff'),
@@ -222,6 +234,10 @@ Messages and names are checked so nothing special (quotes, dollar signs, backtic
 
 ## Permissions
 **terminal**, to type commands into the terminal.
+
+## Sidebar
+
+Since 1.1.0 an activity bar page shows the commands as buttons, grouped as Changes, Sync, Commit, Branches, Stash and This file.
 `,
   },
   {
@@ -332,7 +348,7 @@ No permissions needed. Hashing happens on your computer.
 `,
   },
   {
-    id: 'todo-tree', name: 'TODO Tree', icon: 'TD', category: 'Productivity', perms: ['workspace.read'],
+    id: 'todo-tree', api: '^0.1.1', version: '1.1.0', views: { boxes: [{ id: 'todo', title: 'TODO', icon: 'checklist' }], list: [{ id: 'todoTree.items', name: 'Items', container: 'todo', type: 'tree' }] }, hidden: ['todoTree.openAt'], name: 'TODO Tree', icon: 'TD', category: 'Productivity', perms: ['workspace.read'],
     desc: 'Find TODO, FIXME, HACK, BUG and NOTE comments across your project and jump to them from a panel.',
     commands: [C('todoTree.show', 'Show TODO Tree'), C('todoTree.list', 'List TODOs...')],
     keys: [['todoTree.show', 'Shift+Alt+O']],
@@ -345,6 +361,106 @@ Only text in comments is matched, and binary files, images, lock files and \`nod
 
 ## Permissions
 **workspace.read**, to read the files of the folder you opened. Nothing is sent anywhere.
+
+## Sidebar
+
+Since 1.1.0 the TODO icon in the activity bar shows the same items as a tree: files at the top, the TODOs under them, with a count badge. It scans again when you save.
+`,
+  },
+  {
+    id: 'color-swatches', api: '^0.1.1', name: 'Color Swatches', icon: 'CS', category: 'Tools', perms: [], startup: true, version: '1.0.0',
+    desc: 'Paints every color in your code (hex, rgb, hsl) with that color as its background, so you see it as you read it.',
+    commands: [C('colorSwatches.toggle', 'Color Swatches: How to Turn Off')],
+    keys: [],
+    config: { 'colorSwatches.enabled': { type: 'boolean', default: true, description: 'Paint colors in the text.' }, 'colorSwatches.maxPerFile': { type: 'number', default: 3000, description: 'The most colors to paint in one file.' } },
+    readme: `# Color Swatches
+
+Every color you write in your code is painted with that color behind it, with black or white text for the best contrast: \`#ff8800\`, \`rgb(0, 128, 255)\`, \`hsl(280, 60%, 50%)\`, with or without alpha. Hover a color to see its value. It works in every language and updates as you type.
+
+This extension uses the **decorations** API: it only paints, it never changes your file. No permissions needed.
+`,
+  },
+  {
+    id: 'todo-highlight', api: '^0.1.1', name: 'TODO Highlight', icon: 'TH', category: 'Productivity', perms: [], startup: true, version: '1.0.0',
+    desc: 'Makes TODO, FIXME, HACK, BUG and NOTE stand out in your comments with colored labels.',
+    commands: [],
+    keys: [],
+    config: { 'todoHighlight.enabled': { type: 'boolean', default: true, description: 'Highlight the tags.' }, 'todoHighlight.tags': { type: 'string', default: '', description: 'Your own tags, separated by commas. Empty means TODO, FIXME, BUG, HACK, XXX, NOTE, REVIEW and OPTIMIZE.' } },
+    readme: `# TODO Highlight
+
+Tags in comments get a colored label: blue TODO, red FIXME and BUG, amber HACK and XXX, green NOTE, purple REVIEW, teal OPTIMIZE. Only tags inside comments are marked, so a variable named \`TODO_LIST\` is left alone. Use it with **TODO Tree** to also list them in the sidebar.
+
+Uses the **decorations** API. No permissions needed.
+`,
+  },
+  {
+    id: 'trailing-whitespace', api: '^0.1.1', name: 'Trailing Whitespace', icon: 'TW', category: 'Formatters', perms: [], startup: true, version: '1.0.0',
+    desc: 'Shows spaces and tabs left at the end of lines in red, and removes them with one command.',
+    commands: [C('trailingWhitespace.trim', 'Remove Trailing Whitespace')],
+    keys: [],
+    config: { 'trailingWhitespace.enabled': { type: 'boolean', default: true, description: 'Highlight trailing whitespace.' }, 'trailingWhitespace.ignoreBlankLines': { type: 'boolean', default: false, description: 'Do not mark lines that are only whitespace.' } },
+    readme: `# Trailing Whitespace
+
+Spaces and tabs at the end of a line are drawn in red. The line you are typing on is left alone, so the space after a word does not flash. Run **Remove Trailing Whitespace** to clean the whole file in one undoable step.
+
+Uses the **decorations** API. No permissions needed.
+`,
+  },
+  {
+    id: 'indent-rainbow', api: '^0.1.1', name: 'Indent Rainbow', icon: 'IR', category: 'Tools', perms: [], startup: true, version: '1.0.0',
+    desc: 'Tints each level of indentation in a different soft color, and flags indentation that does not fit.',
+    commands: [],
+    keys: [],
+    config: { 'indentRainbow.enabled': { type: 'boolean', default: true, description: 'Color the indentation.' }, 'indentRainbow.indentSize': { type: 'number', default: 4, description: 'Spaces per indentation level.' }, 'indentRainbow.markIrregular': { type: 'boolean', default: true, description: 'Mark indentation that is not a whole number of levels, or mixes tabs and spaces, in red.' } },
+    readme: `# Indent Rainbow
+
+Four soft colors repeat along the indentation, so you can see at a glance how deep a line is and where a block ends. Indentation that is not a whole number of levels, or that mixes tabs and spaces, is marked in red.
+
+Set the number of spaces per level in the settings (4 by default). Uses the **decorations** API. No permissions needed.
+`,
+  },
+  {
+    id: 'long-lines', api: '^0.1.1', name: 'Long Lines', icon: 'LL', category: 'Formatters', perms: [], startup: true, version: '1.0.0',
+    desc: 'Marks the part of a line that goes past your limit and shows how long the line is.',
+    commands: [],
+    keys: [],
+    config: { 'longLines.enabled': { type: 'boolean', default: true, description: 'Mark long lines.' }, 'longLines.maxColumns': { type: 'number', default: 100, description: 'The line length limit.' }, 'longLines.showLength': { type: 'boolean', default: true, description: 'Show "123 characters" after a long line.' } },
+    readme: `# Long Lines
+
+The part of a line past the limit (100 by default) is underlined with an amber wave, and a note after the line says how many characters it has. Tabs count as 4 columns. Hover the wave for how far over the limit it is.
+
+Uses the **decorations** API, including text after the line. No permissions needed.
+`,
+  },
+  {
+    id: 'outline-lite', api: '^0.1.1', name: 'Outline Lite', icon: 'OL', category: 'Productivity', perms: [], startup: true, version: '1.0.0',
+    views: { boxes: [{ id: 'outline', title: 'Outline', icon: 'symbol-class' }], list: [{ id: 'outlineLite.symbols', name: 'Symbols', container: 'outline', type: 'tree' }] }, hidden: ['outlineLite.goto'],
+    desc: 'A sidebar outline of the open file: classes, functions and headings in a tree. Click one to jump to it.',
+    commands: [C('outlineLite.show', 'Show Outline')],
+    keys: [],
+    config: {},
+    readme: `# Outline Lite
+
+An **Outline** icon in the activity bar shows the structure of the file you are editing as a tree, with a count badge. Click an item to put the cursor on it. It updates as you type.
+
+It understands JavaScript and TypeScript (also Vue and Svelte), Python, Rust, Go, C and C++, Java, C#, Kotlin, Scala, Dart, Swift, PHP, Ruby, shell, Markdown headings, CSS, SQL and HTML sections. It works from patterns, not a language server, so it is fast but can miss unusual code.
+
+Uses the **sidebar views** API. No permissions needed.
+`,
+  },
+  {
+    id: 'recent-files', api: '^0.1.1', name: 'Recent Files', icon: 'RF', category: 'Productivity', perms: ['workspace.read'], startup: true, version: '1.0.0',
+    views: { boxes: [{ id: 'recent', title: 'Recent Files', icon: 'history' }], list: [{ id: 'recentFiles.list', name: 'Recent', container: 'recent', type: 'tree' }] }, hidden: ['recentFiles.open'],
+    desc: 'A sidebar list of the files you opened lately, newest first, remembered for each project.',
+    commands: [C('recentFiles.clear', 'Clear Recent Files')],
+    keys: [],
+    config: { 'recentFiles.max': { type: 'number', default: 30, description: 'How many files to remember for each project.' } },
+    readme: `# Recent Files
+
+A **Recent Files** icon in the activity bar lists the files you opened, newest first, with how long ago. Click one to open it again. The list is kept for each project and stays between sessions.
+
+## Permissions
+**workspace.read**, to open a file when you click it.
 `,
   },
 ];

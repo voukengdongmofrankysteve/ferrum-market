@@ -29,9 +29,29 @@ exports._test = { html };
 
 exports.activate = function (context) {
   let panel = null;
+  let page = null;
   const project = () => ferrum.workspace.root || '(no folder)';
   const label = () => (project().split(/[\\/]/).filter(Boolean).pop() || 'No folder');
   const read = async () => (await ferrum.storage.get('notes.v1', {}))[project()] || '';
+
+  // The same notepad as a sidebar page. Both show the same notes.
+  async function handle(m) {
+    if (m.type === 'save') {
+      const all = await ferrum.storage.get('notes.v1', {});
+      if (m.text) all[project()] = String(m.text).slice(0, 200000);
+      else delete all[project()];
+      await ferrum.storage.set('notes.v1', all);
+    } else if (m.type === 'insert') {
+      const doc = await ferrum.editor.active();
+      if (!doc) return ferrum.window.showMessage('Open a file to insert the notes into.', 'warn');
+      await ferrum.editor.insert(String(m.text || ''));
+    }
+  }
+  read().then((text) => {
+    page = ferrum.window.registerHtmlView('quickNotes.page', { html: html(label(), text) });
+    context.subscriptions.push(page);
+    page.onMessage(async (m) => { await handle(m); if (m.type === 'save') page.postMessage({ type: 'saved' }); });
+  });
 
   context.subscriptions.push(
     ferrum.commands.register('quickNotes.open', async () => {

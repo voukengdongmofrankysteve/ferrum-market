@@ -15,9 +15,9 @@ final class Bundle
 
     public const PERMISSIONS = ['workspace.read', 'workspace.write', 'terminal', 'network', 'clipboard'];
 
-    public const CONTRIBUTES = ['commands', 'keybindings', 'themes', 'iconThemes', 'languages', 'snippets', 'configuration'];
+    public const CONTRIBUTES = ['commands', 'keybindings', 'themes', 'iconThemes', 'languages', 'snippets', 'configuration', 'viewsContainers', 'views'];
 
-    public const ACTIVATION = ['onStartup', 'onCommand', 'onLanguage', 'onFileOpen', 'onSave'];
+    public const ACTIVATION = ['onStartup', 'onCommand', 'onLanguage', 'onFileOpen', 'onSave', 'onView'];
 
     public const MAX_BYTES = 1_500_000;
 
@@ -115,6 +115,45 @@ final class Bundle
         foreach ((array) ($m['contributes']['commands'] ?? []) as $c) {
             if (! is_array($c) || ! preg_match('/^[A-Za-z0-9._-]{3,80}$/', (string) ($c['command'] ?? '')) || trim((string) ($c['title'] ?? '')) === '') {
                 $fail('Each contributes.commands entry needs a "command" id (letters, digits, dots) and a "title".');
+            }
+        }
+        $boxes = (array) ($m['contributes']['viewsContainers'] ?? []);
+        if (count($boxes) > 3) {
+            $fail('contributes.viewsContainers can have 3 entries at most.');
+        }
+        $boxIds = [];
+        foreach ($boxes as $b) {
+            $bid = is_array($b) ? (string) ($b['id'] ?? '') : '';
+            if (! preg_match('/^[a-z0-9][a-z0-9-]{0,40}$/', $bid)) {
+                $fail('Each contributes.viewsContainers entry needs an id of lower case letters, digits and dashes.');
+            }
+            $title = is_array($b) ? trim((string) ($b['title'] ?? '')) : '';
+            if ($title === '' || mb_strlen($title) > 30) {
+                $fail('Each contributes.viewsContainers entry needs a title of 30 characters at most.');
+            }
+            if (is_array($b) && isset($b['icon']) && ! preg_match('/^[a-z0-9-]{1,40}$/', (string) $b['icon'])) {
+                $fail('A viewsContainers icon is a Codicon name such as "checklist".');
+            }
+            $boxIds[] = $bid;
+        }
+        $viewList = (array) ($m['contributes']['views'] ?? []);
+        if (count($viewList) > 6) {
+            $fail('contributes.views can have 6 entries at most.');
+        }
+        foreach ($viewList as $v) {
+            $vid = is_array($v) ? (string) ($v['id'] ?? '') : '';
+            if (! preg_match('/^[A-Za-z0-9._-]{3,80}$/', $vid)) {
+                $fail('Each contributes.views entry needs an id of 3 to 80 letters, digits, dots, dashes or underscores.');
+            }
+            $vname = is_array($v) ? trim((string) ($v['name'] ?? '')) : '';
+            if ($vname === '' || mb_strlen($vname) > 40) {
+                $fail('Each contributes.views entry needs a name of 40 characters at most.');
+            }
+            if (! is_array($v) || ! in_array((string) ($v['container'] ?? ''), $boxIds, true)) {
+                $fail('contributes.views "'.$vid.'" points to a container that is not in contributes.viewsContainers.');
+            }
+            if (is_array($v) && isset($v['type']) && ! in_array($v['type'], ['tree', 'html'], true)) {
+                $fail('A view type is "tree" or "html".');
             }
         }
         foreach (['themes', 'iconThemes', 'snippets'] as $point) {

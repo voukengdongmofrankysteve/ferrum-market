@@ -123,7 +123,12 @@ for (const t of TOOLS) {
   const code = readFileSync(join(here, 'tools', t.id + '.js'), 'utf8');
   const props = {};
   for (const [k, v] of Object.entries(t.config ?? {})) props[k] = v;
-  const contributes = { commands: t.commands.map((c) => ({ command: c.id, title: c.title, category: t.name })) };
+  const hidden = (t.hidden ?? []).map((id) => ({ command: id, title: t.name + ' (internal)', category: t.name, hidden: true }));
+  const contributes = { commands: [...t.commands.map((c) => ({ command: c.id, title: c.title, category: t.name })), ...hidden] };
+  if (t.views) {
+    contributes.viewsContainers = t.views.boxes;
+    contributes.views = t.views.list;
+  }
   if (t.keys?.length) contributes.keybindings = t.keys.map(([command, key]) => ({ command, key }));
   if (Object.keys(props).length) contributes.configuration = { title: t.name, properties: props };
   const files = {
@@ -132,8 +137,10 @@ for (const t of TOOLS) {
     'README.md': text(t.readme),
   };
   const manifest = base(t.id, t.name, t.desc, t.category, {
+    version: t.version ?? VERSION,
+    engines: { ferrum: t.api ?? '^0.1.0' },
     main: 'extension.js',
-    activationEvents: t.startup ? ['onStartup'] : t.commands.map((c) => 'onCommand:' + c.id),
+    activationEvents: t.startup ? ['onStartup'] : [...(t.views?.list ?? []).map((v) => 'onView:' + v.id), ...t.commands.map((c) => 'onCommand:' + c.id), ...(t.hidden ?? []).map((id) => 'onCommand:' + id)],
     permissions: t.perms,
     contributes,
   });

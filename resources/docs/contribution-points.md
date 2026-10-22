@@ -1,6 +1,6 @@
 # Contribution points
 
-`contributes` in the manifest declares what an extension adds. Ferrum applies contributions when the extension is installed or turned on, **without running any code**. Seven contribution points exist.
+`contributes` in the manifest declares what an extension adds. Ferrum applies contributions when the extension is installed or turned on, **without running any code**. Nine contribution points exist.
 
 ```json
 "contributes": {
@@ -10,7 +10,9 @@
   "iconThemes": [],
   "languages": [],
   "snippets": [],
-  "configuration": {}
+  "configuration": {},
+  "viewsContainers": [],
+  "views": []
 }
 ```
 
@@ -29,6 +31,7 @@ Adds entries to the command palette (Ctrl+Shift+P).
 | `command` | The command id: 3 to 80 characters, letters, digits, dots, dashes and underscores. Prefix it with your extension's name. |
 | `title` | The label. Required. |
 | `category` | Optional. The palette shows `Category: Title`. |
+| `hidden` | Optional. `true` keeps the command out of the palette. It can still be run by a click in a [sidebar tree](/docs/views) or by `ferrum.commands.execute`. |
 
 The function behind the command is registered in your code with `ferrum.commands.register`. If the code is not running yet, Ferrum activates the extension on first use. See [Commands and keybindings](/docs/commands).
 
@@ -109,6 +112,17 @@ Adds snippets for a language.
 ```
 
 `language` is a language name as the editor shows it (for example `JavaScript`, `Rust`) or the `name` of a language your extension adds, or `*` for every language. The file uses VS Code's snippet format. See [Snippets](/docs/snippets).
+
+## viewsContainers and views
+
+Add an icon to the activity bar and fill the sidebar with a tree or a page of HTML. A container is the icon; a view is a section inside it.
+
+```json
+"viewsContainers": [{ "id": "todo", "title": "TODO", "icon": "checklist" }],
+"views": [{ "id": "todo.items", "name": "Items", "container": "todo", "type": "tree" }]
+```
+
+See [Sidebar views](/docs/views) for every key, the tree API and HTML views.
 
 ## configuration
 

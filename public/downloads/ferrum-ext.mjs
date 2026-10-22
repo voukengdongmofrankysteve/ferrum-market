@@ -10,8 +10,8 @@ import { createInterface } from 'node:readline/promises';
 const DEFAULT_SERVER = 'https://ferrum.vyloxi.com';
 const CATEGORIES = ['Themes', 'Languages', 'Snippets', 'Formatters', 'Linters', 'Git', 'AI', 'Tools', 'Productivity', 'Other'];
 const PERMISSIONS = ['workspace.read', 'workspace.write', 'terminal', 'network', 'clipboard'];
-const CONTRIBUTES = ['commands', 'keybindings', 'themes', 'iconThemes', 'languages', 'snippets', 'configuration'];
-const ACTIVATION = ['onStartup', 'onCommand', 'onLanguage', 'onFileOpen', 'onSave'];
+const CONTRIBUTES = ['commands', 'keybindings', 'themes', 'iconThemes', 'languages', 'snippets', 'configuration', 'viewsContainers', 'views'];
+const ACTIVATION = ['onStartup', 'onCommand', 'onLanguage', 'onFileOpen', 'onSave', 'onView'];
 const MAX_BYTES = 1_500_000;
 const MAX_FILES = 200;
 
@@ -65,6 +65,21 @@ export function checkManifest(m, files) {
   for (const l of c.languages ?? []) {
     if (!/^[a-z0-9][a-z0-9-]{0,30}$/.test(l?.id ?? '')) bad('Each contributes.languages entry needs an id of lower case letters, digits and dashes.');
     if (l?.grammar && !files[l.grammar]) bad(`contributes.languages grammar points to "${l.grammar}", which is not in the package.`);
+  }
+  const boxes = c.viewsContainers ?? [];
+  if (boxes.length > 3) bad('contributes.viewsContainers can have 3 entries at most.');
+  for (const b of boxes) {
+    if (!/^[a-z0-9][a-z0-9-]{0,40}$/.test(b?.id ?? '')) bad('Each contributes.viewsContainers entry needs an id of lower case letters, digits and dashes.');
+    if (!String(b?.title ?? '').trim() || String(b.title).length > 30) bad('Each contributes.viewsContainers entry needs a title of 30 characters at most.');
+    if (b?.icon !== undefined && !/^[a-z0-9-]{1,40}$/.test(b.icon)) bad('A viewsContainers icon is a Codicon name such as "checklist".');
+  }
+  const viewList = c.views ?? [];
+  if (viewList.length > 6) bad('contributes.views can have 6 entries at most.');
+  for (const v of viewList) {
+    if (!/^[A-Za-z0-9._-]{3,80}$/.test(v?.id ?? '')) bad('Each contributes.views entry needs an id of 3 to 80 letters, digits, dots, dashes or underscores.');
+    if (!String(v?.name ?? '').trim() || String(v.name).length > 40) bad('Each contributes.views entry needs a name of 40 characters at most.');
+    if (!boxes.some((b) => b.id === v?.container)) bad(`contributes.views "${v?.id}" points to the container "${v?.container}", which is not in contributes.viewsContainers.`);
+    if (v?.type !== undefined && v.type !== 'tree' && v.type !== 'html') bad('A view type is "tree" or "html".');
   }
   for (const cmd of c.commands ?? []) if (!/^[A-Za-z0-9._-]{3,80}$/.test(cmd?.command ?? '') || !String(cmd?.title ?? '').trim()) bad('Each contributes.commands entry needs a "command" id and a "title".');
   if (m.icon) {

@@ -11,6 +11,7 @@ Activation events are listed in `activationEvents` in the manifest. Extensions t
 | `onLanguage:<id>` | When a file in that language is opened. The id is a language id, such as `rust` or one you contribute. |
 | `onFileOpen:<pattern>` | When a file whose name matches the pattern is opened. The pattern may use `*`, for example `onFileOpen:*.toml` or `onFileOpen:Dockerfile`. |
 | `onSave` | The first time any file is saved. |
+| `onView:<id>` | When the person opens the sidebar container that holds the view `<id>`. See [Sidebar views](/docs/views). |
 
 ## Commands you contribute activate automatically
 

@@ -22,6 +22,8 @@ function load(id, settings = {}) {
       confirm: async () => true,
       setStatusBar: (k, v) => (log.status[k] = v),
       withProgress: (t, fn) => fn(),
+      registerTreeView: (id, provider) => ({ refresh() {}, setBadge() {}, setTitle() {}, dispose() {}, provider }),
+      registerHtmlView: () => ({ setHtml() {}, postMessage() {}, onMessage() {}, setBadge() {}, dispose() {} }),
       showPanel: async (p) => {
         const panel = { html: p.html, title: p.title, handlers: [], setHtml(h) { this.html = h; }, setTitle() {}, onMessage(f) { this.handlers.push(f); }, onDidClose() {}, postMessage() {} };
         log.panels.push(panel);
@@ -33,6 +35,8 @@ function load(id, settings = {}) {
       insert: async (t) => { log.inserted.push(t); if (doc.selectedText) { doc.text = doc.text.replace(doc.selectedText, t); doc.selectedText = ''; } else doc.text = t; },
       replace: async (r, t) => { log.replaced.push([r, t]); doc.text = t; },
       edit: async (e) => log.replaced.push(['edit', e]),
+      createDecorationType: () => ({ id: 1, dispose() {} }),
+      setDecorations: async () => {},
       getLine: async (n) => doc.text.split('\n')[n] ?? '',
       getText: async () => doc.text,
       setSelection: async () => {},

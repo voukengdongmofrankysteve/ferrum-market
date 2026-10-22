@@ -87,7 +87,28 @@ exports.activate = function (context) {
     }
   }
 
+  // The sidebar: files as top items, TODOs under them. The scan is kept until Refresh or a save.
+  let cache = null;
+  const view = ferrum.window.registerTreeView('todoTree.items', {
+    getChildren: async (element) => {
+      if (!cache) {
+        try { cache = await collect(); } catch (e) { cache = { groups: [], total: 0, error: e.message }; }
+        view.setBadge(cache.total);
+      }
+      if (cache.error) return [{ id: 'err', label: cache.error, icon: 'info' }];
+      if (!element) {
+        return cache.groups.map((g) => ({ id: 'f:' + g.file, label: g.file.split('/').pop(), description: g.items.length + '  ' + g.file.replace(/[^/]*$/, '').replace(/\/$/, ''), icon: 'file', collapsible: 'expanded', tooltip: g.file }));
+      }
+      const g = cache.groups.find((x) => 'f:' + x.file === element.id);
+      return g ? g.items.map((it) => ({ id: g.file + ':' + it.line, label: (it.text || '(no text)'), description: it.tag + (it.who ? ' (' + it.who + ')' : '') + '  line ' + (it.line + 1), icon: 'circle-filled', color: COLORS[it.tag] || '#888888', command: 'todoTree.openAt', args: [g.file, it.line] })) : [];
+    },
+  });
+
   context.subscriptions.push(
+    view,
+    ferrum.commands.register('todoTree.refresh', () => { cache = null; view.refresh(); }),
+    ferrum.commands.register('todoTree.openAt', async (file, line) => { if (file) await ferrum.editor.openFile(String(file), { line: Number(line) || 0, col: 0 }); }),
+    ferrum.events.on('save', () => { cache = null; view.refresh(); }),
     ferrum.commands.register('todoTree.show', show),
     ferrum.commands.register('todoTree.list', async () => {
       try {

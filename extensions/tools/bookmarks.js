@@ -24,12 +24,33 @@ exports.activate = function (context) {
   const all = () => ferrum.storage.get(KEY, {});
   const save = (v) => ferrum.storage.set(KEY, v);
   const key = (doc) => doc.path || '(unsaved) ' + doc.name;
-  let lastCount = new Map();
+  const star = ferrum.editor.createDecorationType({ gutterText: '\u2605', gutterColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.12)', isWholeLine: true });
+  context.subscriptions.push(star);
+
+  // The sidebar: files with bookmarks, and their lines under each.
+  const view = ferrum.window.registerTreeView('bookmarks.list', {
+    getChildren: async (element) => {
+      const data = await all();
+      if (!element) {
+        return Object.entries(data)
+          .filter(([, lines]) => lines.length)
+          .map(([file, lines]) => ({ id: 'f:' + file, label: file.split(/[\\/]/).pop(), description: lines.length + (lines.length === 1 ? ' bookmark' : ' bookmarks'), icon: 'file', tooltip: file, collapsible: 'expanded' }));
+      }
+      const file = String(element.id).slice(2);
+      return (data[file] || []).map((l) => ({ id: 'l:' + file + ':' + l, label: 'Line ' + (l + 1), icon: 'bookmark', color: '#f59e0b', command: 'bookmarks.goto', args: [file, l] }));
+    },
+  });
+  context.subscriptions.push(view);
 
   async function status() {
     const doc = await ferrum.editor.active();
+    const data = await all();
+    view.setBadge(Object.values(data).reduce((n, l) => n + l.length, 0));
+    view.refresh();
     if (!doc) return ferrum.window.setStatusBar('bookmarks.status', { text: '' });
-    const n = ((await all())[key(doc)] || []).length;
+    const lines = data[key(doc)] || [];
+    await ferrum.editor.setDecorations(star, lines.map((l) => ({ start: { line: l, col: 0 }, end: { line: l, col: 0 } })));
+    const n = lines.length;
     ferrum.window.setStatusBar('bookmarks.status', n ? { text: 'Bookmarks: ' + n, tooltip: n + ' bookmarks in this file. Click to list them.', command: 'bookmarks.list' } : { text: '' });
   }
 
@@ -67,6 +88,10 @@ exports.activate = function (context) {
     await ferrum.editor.openFile(pick.file, { line: pick.line, col: 0 });
   });
 
+  reg('bookmarks.goto', async (file, line) => {
+    if (typeof file !== 'string' || file.startsWith('(unsaved)')) return;
+    await ferrum.editor.openFile(file, { line: Number(line) || 0, col: 0 });
+  });
   reg('bookmarks.clearFile', async () => {
     const doc = await ferrum.editor.active();
     if (!doc) return;
@@ -82,7 +107,7 @@ exports.activate = function (context) {
     }
   });
 
-  context.subscriptions.push(ferrum.events.on('activeChanged', status), ferrum.events.on('save', status));
+  context.subscriptions.push(ferrum.events.on('activeChanged', status), ferrum.events.on('open', status), ferrum.events.on('change', status), ferrum.events.on('save', status));
   status();
 };
 

@@ -25,9 +25,27 @@ function branchName(s) {
 
 exports._test = { q, qpath, commitCommand, branchName };
 
+const BUTTONS = [
+  ['Changes', [['gitQuick.status', 'Status'], ['gitQuick.diff', 'Diff'], ['gitQuick.diffStaged', 'Staged diff'], ['gitQuick.log', 'Log']]],
+  ['Sync', [['gitQuick.fetch', 'Fetch'], ['gitQuick.pull', 'Pull'], ['gitQuick.push', 'Push']]],
+  ['Commit', [['gitQuick.commit', 'Commit staged...'], ['gitQuick.commitAll', 'Stage all and commit...'], ['gitQuick.amend', 'Amend'], ['gitQuick.undoCommit', 'Undo last commit']]],
+  ['Branches', [['gitQuick.newBranch', 'New branch...'], ['gitQuick.switchBranch', 'Switch...'], ['gitQuick.branches', 'List'], ['gitQuick.tag', 'Tag...']]],
+  ['Stash', [['gitQuick.stash', 'Stash'], ['gitQuick.stashPop', 'Pop']]],
+  ['This file', [['gitQuick.fileHistory', 'History'], ['gitQuick.blameFile', 'Blame']]],
+];
+
+function sidebarPage() {
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const groups = BUTTONS.map(([title, list]) => '<h4>' + esc(title) + '</h4><div class="g">' + list.map(([id, label]) => '<button data-c="' + id + '">' + esc(label) + '</button>').join('') + '</div>').join('');
+  return '<style>body{font-family:var(--ui);padding:8px 10px}h4{margin:12px 0 6px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-dim)}.g{display:flex;flex-wrap:wrap;gap:6px}button{background:var(--raised,transparent);color:var(--fg);border:1px solid var(--border);border-radius:5px;padding:4px 9px;cursor:pointer;font-size:12px}button:hover{border-color:var(--accent)}</style>' + groups + '<script>document.querySelectorAll("button[data-c]").forEach(function(b){b.onclick=function(){ferrumPanel.postMessage({type:"run",id:b.dataset.c})}})</script>';
+}
+
 exports.activate = function (context) {
   const reg = (id, fn) => context.subscriptions.push(ferrum.commands.register(id, fn));
   const run = (cmd) => ferrum.terminal.run(cmd);
+  const page = ferrum.window.registerHtmlView('gitQuick.actions', { html: sidebarPage() });
+  context.subscriptions.push(page);
+  page.onMessage((m) => { if (m && m.type === 'run' && BUTTONS.some(([, l]) => l.some(([id]) => id === m.id))) ferrum.commands.execute(m.id); });
   const simple = {
     'gitQuick.status': 'git status -sb', 'gitQuick.pull': 'git pull --ff-only', 'gitQuick.push': 'git push', 'gitQuick.fetch': 'git fetch --all --prune',
     'gitQuick.log': 'git log --oneline --graph --decorate -20', 'gitQuick.diff': 'git diff', 'gitQuick.diffStaged': 'git diff --staged', 'gitQuick.stash': 'git stash push -u',

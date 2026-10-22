@@ -59,6 +59,28 @@ exports.activate = function (context) {
     await ferrum.terminal.run(cd + runCommand(info.manager, name, extra));
   };
 
+  // The sidebar: every script, a click runs it.
+  const view = ferrum.window.registerTreeView('npmScripts.list', {
+    getChildren: async (element) => {
+      if (element) return [];
+      try {
+        const info = await load();
+        view.setBadge(info.scripts.length);
+        return info.scripts.map((s) => ({ id: s.name, label: s.name, description: s.cmd, icon: 'play', color: '#3fb950', tooltip: info.manager + ' run ' + s.name + '   (' + s.cmd + ')', command: 'npmScripts.runScript', args: [s.name] }));
+      } catch (e) {
+        return [{ id: 'none', label: e.message, icon: 'info' }];
+      }
+    },
+  });
+  context.subscriptions.push(
+    view,
+    ferrum.commands.register('npmScripts.runScript', async (name) => {
+      try { await exec(await load(), String(name)); } catch (e) { ferrum.window.showMessage(e.message, 'warn'); }
+    }),
+    ferrum.commands.register('npmScripts.refresh', () => view.refresh()),
+    ferrum.events.on('save', (info) => { if (info && /package\.json$/.test(info.name || '')) view.refresh(); }),
+  );
+
   reg('npmScripts.run', async () => {
     try {
       const info = await load();
