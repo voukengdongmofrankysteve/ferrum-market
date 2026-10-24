@@ -3,6 +3,7 @@
 @section('content')
 <div class="wrap">
     <h1>Administration</h1>
+    <p><a class="btn small" href="{{ route('admin.ai') }}">Built-in AI: settings, spending and people</a></p>
     <h2>Publishers</h2>
     <table><thead><tr><th>Id</th><th>Name</th><th>Owner</th><th>Verified</th><th></th></tr></thead><tbody>
     @foreach ($publishers as $p)

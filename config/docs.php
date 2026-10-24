@@ -22,6 +22,7 @@ return [
         'publishing' => ['title' => 'Publishing', 'group' => 'Marketplace', 'summary' => 'Accounts, publishers, tokens, versions and the rules.'],
         'cli' => ['title' => 'The ferrum-ext tool', 'group' => 'Marketplace', 'summary' => 'Create, package and publish from the command line.'],
         'api-rest' => ['title' => 'Marketplace API', 'group' => 'Marketplace', 'summary' => 'The HTTP API the editor uses.'],
+        'ai-plan' => ['title' => 'Ferrum AI', 'group' => 'Marketplace', 'summary' => 'The built-in AI plan: sign in, daily allowance, and how the server is run.'],
         'faq' => ['title' => 'FAQ and troubleshooting', 'group' => 'Marketplace', 'summary' => 'Common questions and errors.'],
     ],
 ];

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminAiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,7 @@ Route::get('/robots.txt', [PageController::class, 'robots']);
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'registerForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:auth');
+    Route::post('/register', [AuthController::class, 'register'])->middleware(['throttle:auth', 'throttle:signup']);
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:auth');
 });
@@ -35,4 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/extensions/{extension}/review', [PageController::class, 'review'])->middleware('throttle:publish')->name('review');
     Route::get('/admin', [AccountController::class, 'admin'])->name('admin');
     Route::post('/admin/publishers/{publisher}/verify', [AccountController::class, 'adminVerify'])->name('admin.verify');
+    Route::get('/admin/ai', [AdminAiController::class, 'show'])->name('admin.ai');
+    Route::post('/admin/ai', [AdminAiController::class, 'save'])->name('admin.ai.save');
+    Route::post('/admin/ai/people/{user}', [AdminAiController::class, 'person'])->name('admin.ai.person');
 });
