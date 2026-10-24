@@ -6,7 +6,7 @@
     <p><a href="{{ route('admin') }}">Back to administration</a></p>
 
     <h2>This month</h2>
-    <table><tbody>
+    <table class="ai-table"><tbody>
         <tr><td>Spent so far</td><td><b>${{ number_format($monthCost, 2) }}</b> of the ${{ number_format($cap, 2) }} cap @if ($cap > 0)({{ round(100 * $monthCost / $cap) }}%)@endif</td></tr>
         <tr><td>Today</td><td>{{ number_format($todayTokens) }} tokens by {{ $todayPeople }} {{ $todayPeople === 1 ? 'person' : 'people' }}</td></tr>
         <tr><td>State</td><td>{{ !$enabled ? 'Switched off' : (!$hasKey ? 'Waiting for a provider key' : ($monthCost >= $cap ? 'Paused: the monthly cap is reached' : 'Running')) }}</td></tr>
@@ -31,23 +31,23 @@
     @endif
 
     <h2>Settings</h2>
-    <form method="post" action="{{ route('admin.ai.save') }}" class="stack">
+    <form method="post" action="{{ route('admin.ai.save') }}" class="form">
         @csrf
-        <label><input type="checkbox" name="enabled" value="1" @checked(old('enabled', $enabled))> The built-in AI is on</label>
+        <label class="check"><input type="checkbox" name="enabled" value="1" @checked(old('enabled', $enabled))> The built-in AI is on</label>
         <label>Provider address (OpenAI compatible)
             <input name="upstream_url" value="{{ old('upstream_url', $url) }}" required>
-            <small>OpenRouter: https://openrouter.ai/api/v1 &middot; DeepSeek: https://api.deepseek.com/v1</small>
+            <small class="hint">OpenRouter: https://openrouter.ai/api/v1 &middot; DeepSeek: https://api.deepseek.com/v1</small>
         </label>
-        <label>Provider key {!! $hasKey ? '<small>(one is saved; leave empty to keep it)</small>' : '<small>(none yet)</small>' !!}
+        <label>Provider key {!! $hasKey ? '<small class="hint">(one is saved; leave empty to keep it)</small>' : '<small class="hint">(none yet)</small>' !!}
             <input type="password" name="upstream_key" autocomplete="off" placeholder="{{ $hasKey ? '••••••••••••' : 'sk-...' }}">
-            <small>Stored encrypted on this server. It is never sent to the editor.</small>
+            <small class="hint">Stored encrypted on this server. It is never sent to the editor.</small>
         </label>
-        @if ($hasKey)<label><input type="checkbox" name="remove_key" value="1"> Remove the saved key</label>@endif
+        @if ($hasKey)<label class="check"><input type="checkbox" name="remove_key" value="1"> Remove the saved key</label>@endif
         <label>Models (JSON)
             <textarea name="models" rows="14" spellcheck="false" required>{{ old('models', $modelsJson) }}</textarea>
-            <small>"id" is what people see, "upstream" is the provider's model name, "in" and "out" are dollars per million tokens (used when the provider does not report a cost), "plans" lists who may use it.</small>
+            <small class="hint">"id" is what people see, "upstream" is the provider's model name, "in" and "out" are dollars per million tokens (used when the provider does not report a cost), "plans" lists who may use it.</small>
         </label>
-        <div class="row">
+        <div class="ai-row">
             <label>Free tokens per day <input type="number" name="free_daily_tokens" min="0" value="{{ old('free_daily_tokens', $free) }}" required></label>
             <label>Pro tokens per day <input type="number" name="pro_daily_tokens" min="0" value="{{ old('pro_daily_tokens', $pro) }}" required></label>
             <label>Monthly cap, US dollars <input type="number" name="monthly_cap_usd" min="0" step="0.01" value="{{ old('monthly_cap_usd', $cap) }}" required></label>
@@ -57,14 +57,14 @@
     </form>
 
     <h2>People</h2>
-    <form method="get" action="{{ route('admin.ai') }}"><input type="search" name="q" value="{{ $q }}" placeholder="Find a person by email or name"> <button class="btn small ghost" type="submit">Search</button></form>
+    <form class="ai-find" method="get" action="{{ route('admin.ai') }}"><input type="search" name="q" value="{{ $q }}" placeholder="Find a person by email or name"> <button class="btn small ghost" type="submit">Search</button></form>
     @if ($people->count())
     <table><thead><tr><th>Person</th><th>Plan</th><th>Tokens per day (empty = plan default)</th><th></th></tr></thead><tbody>
     @foreach ($people as $p)
         <tr>
             <td>{{ $p->email }}</td>
-            <td><select name="ai_plan" form="p{{ $p->id }}">@foreach (['free', 'pro', 'blocked'] as $pl)<option value="{{ $pl }}" @selected($p->ai_plan === $pl)>{{ $pl }}</option>@endforeach</select></td>
-            <td><input type="number" name="ai_daily_tokens" min="0" value="{{ $p->ai_daily_tokens }}" form="p{{ $p->id }}"></td>
+            <td><select class="ai-in" name="ai_plan" form="p{{ $p->id }}">@foreach (['free', 'pro', 'blocked'] as $pl)<option value="{{ $pl }}" @selected($p->ai_plan === $pl)>{{ $pl }}</option>@endforeach</select></td>
+            <td><input class="ai-in" type="number" name="ai_daily_tokens" min="0" value="{{ $p->ai_daily_tokens }}" form="p{{ $p->id }}"></td>
             <td><form id="p{{ $p->id }}" method="post" action="{{ route('admin.ai.person', $p) }}">@csrf<button class="btn small" type="submit">Save</button></form></td>
         </tr>
     @endforeach
